@@ -1,0 +1,101 @@
+---
+title: "highered2"
+format: 
+  html: 
+    output-file: "index.html"
+---
+
+```{r}
+library(reactable)
+library(dplyr)
+library(tidyr)
+library(plotly)
+library(crosstalk)
+```
+
+```{r}
+#Find the three countries with the most universities on the above rankings.
+
+df<- read.csv("http://manctsui.github.io/datasets/timesData.csv") 
+
+top_three_country <- df |>
+  select(country,world_rank) |>
+  count(country, sort = TRUE) %>%
+  rename(number_of_universities_on_rank_list = n) |>
+  head(3) 
+
+reactable(top_three_country)
+  
+```
+
+```{r}
+#Display the result of Problem 1A as a barchart in ggplot or plotly
+plot_ly(data= top_three_country, x= ~country, y= ~number_of_universities_on_rank_list, type = "bar", color ="red")
+```
+
+```{r}
+#Display the top 50 universities in the year 2011 as a table with only two columns:
+Topfifty <- df |>
+  filter(year == 2011 & world_rank %in% 1:50) |>
+  select(world_rank, university_name)
+reactable(Topfifty)
+```
+
+```{r}
+#If we are to turn the data frame that results from Problem 1A as a SharedData object, would $rank column be a good candidate to use as a key? Explain.
+
+# No, rank would not be a good candidate to use as a key since some values repeat and for it to be a key, the values must be unique. 
+```
+
+```{r}
+#Create a filter slider from crosstalk that allows us to narrow our selection of universities based on the rank of the university
+
+Based_on_Rank <- df |>
+  mutate(world_rank_num = as.numeric(world_rank)) |>
+  select(university_name,world_rank_num) 
+
+
+sd<- SharedData$new(Based_on_Rank)
+filter_slider("rank_slider", "World Rank", sd, ~world_rank_num)
+reactable(sd)
+
+```
+```{r}
+#Do two separate scatterplots from our university world ranking dataset restricted to the year 2016:
+  #First scatterplot is number of students vs. student-staff ratio.
+  #Second scatterplot is student-staff ratio vs. teaching score.
+  #Link the two scatterplots together via crosstalk.
+
+Yr2016Dataset <- df |>
+  filter(year %in% 2016)
+
+plot1 <- plot_ly(Yr2016Dataset, x= ~num_students, y= ~student_staff_ratio, type= "scatter")
+
+plot1
+
+plot2 <- plot_ly(Yr2016Dataset, x=~student_staff_ratio, y=~teaching, type ="scatter")
+plot2
+
+subplot(plot1,plot2) 
+```
+------------------------------------------------------------------------
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
