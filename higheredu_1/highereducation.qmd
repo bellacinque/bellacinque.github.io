@@ -1,0 +1,90 @@
+---
+title: "highereducation"
+author: "Bella Jones"
+format: 
+  html:
+    output-file: "index.html"
+editor: visual
+---
+
+```{r}
+#| echo: false
+#| warning: false
+library(dplyr)
+library(tidyr)
+library(reactable)
+```
+
+```{r}
+
+df1 <- read.csv("http://manctsui.github.io/datasets/timesData.csv")
+reactable(df1, defaultPageSize = 4, searchable = TRUE)
+```
+
+```{r}
+
+UCLArank <- df1 |>
+  select(year, university_name, world_rank) |>
+  filter(
+    year %in% 2012:2016,
+    university_name == "University of California, Los Angeles"
+  )
+
+reactable(UCLArank)
+
+```
+
+```{r}
+UCBerkeleyrank <- df1 |>
+  select(year, university_name, world_rank) |>
+  filter(
+    year %in% 2012:2016,
+    university_name == "University of California, Berkeley"
+  )
+```
+
+```{r}
+par(mfrow = c(1, 2))
+plot(UCLArank$year, UCLArank$world_rank, xlab = "Year", ylab = "World Rank", main ="UCLA World University Rank", type ="l")
+plot(UCBerkeleyrank$year, UCBerkeleyrank$world_rank, xlab = "Year", ylab = "World Rank", main ="UC Berkeley World University Rank", type ="l")
+par(mfrow = c(1, 1))
+```
+
+$$\text{United States University Ranking (Top 50) through 2012-2016 } $$
+
+```{r}
+#| echo: false
+USUniversity <- df1 |>
+  select(year,university_name,country,world_rank) |>
+  filter(year %in% 2012:2016, country == "United States of America", world_rank <= 50)|>
+  count(year)
+reactable(USUniversity)
+
+```
+
+Throughout the years 2012–2016, the number of U.S. universities ranked in the top 50 did not change much.
+
+From 2012 through 2015, the number was around 90, while 2016 had the highest number, with 112 universities.
+
+------------------------------------------------------------------------
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
