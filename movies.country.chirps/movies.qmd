@@ -1,0 +1,125 @@
+---
+title: "movies"
+format: 
+  html:
+    output-file: "index.html"
+---
+
+```{r}
+library(dplyr)
+
+
+df <- data.frame(
+x = c(5, 1, 4, NA, NA, NA, 2, 1),
+y = c(5, NA, 3, 2, 5, NA, 2, 1),
+z = c(1, 4, 2, 5, 2, NA, 5, 4),
+t = c(4, 2, NA, 1, 5, 2, 3, 3)
+)
+
+# Use collaborative filtering to predict User 2's preference for Movie 6. The data frame is shown below:
+
+cor(df$y, df$x, use = "pairwise.complete.obs")
+cor(df$y, df$z, use = "pairwise.complete.obs")
+cor(df$y, df$t, use = "pairwise.complete.obs")
+
+mean(df$y,na.rm= TRUE)  
+mean(df$t,na.rm = TRUE)
+mean(df$x,na.rm = TRUE)
+
+# User 2 preference for movie 6 based on only user 4's preference for movie 6, 
+# due to NA value present in formula for user 1 preference for movie 6
+User_Y_MPref_6 = ((.72)/(.96+.72))*(2-2.857143)+3
+User_Y_MPref_6
+
+```
+```{r}
+# Use Pearson correlation to determine which movie is the most similar to Movie 1.
+
+dfTransposed= t(df)
+
+cor(dfTransposed, method = "pearson", use = "pairwise.complete.obs")
+
+#Thus, movie 5 is most similar to movie 1 based on pearson correlation with an r value of about .97
+```
+```{r}
+#Apply mean imputation grouped according to region to fill in missing values in the column for "Agriculture" and the column for "Industry" for the countries dataset
+dfc <- read.csv("http://manctsui.github.io/datasets/countries.csv")
+
+
+dfImp <- dfc |>
+  select(Region, Agriculture, Industry) |>
+  group_by(Region) |>
+  mutate(Agriculture = ifelse(is.na(Agriculture), mean(Agriculture,na.rm = TRUE),    Agriculture)) |>
+  mutate(Industry =ifelse(is.na(Industry), mean(Industry, na.rm = TRUE), Industry)) |>
+  ungroup()
+
+dfImp
+
+#How many NA's did you have to fill from each region?
+
+dfc |>
+  select(Region, Industry, Agriculture) |>
+  group_by(Region) |>
+  count(is.na(Industry) & is.na(Agriculture))
+
+# From Latin Amer/Carib there were 2 NA's 
+# From Northern Africa there was 1 NA
+# From Northern America there were 2 NA's
+# From Oceania there were 5 NA's
+# From Sub-Saharan Africa there were 2 NA's
+# From Western Europe there were 3 NA's
+
+```
+```{r}
+library(plotly)
+df3 <- data.frame(
+temp = c(79, 74, 73, 76, 82, 72, 71, 79, 83, 70, 73, 75, 77),
+chirps = c(44, 40, 38, 43, 48, 37, 34, 45, 51, 32, 35, 42, 43)
+)
+
+lm(temp ~ chirps, data = df3)
+
+df3 |>
+plot_ly(x= ~temp, y= ~chirps)
+
+
+r = cor(df3$temp, df3$chirps)
+tempmean = mean(df3$temp)
+sdtemp = sd(df3$temp)
+chirpsmean = mean(df3$chirps)
+sdchirps = sd(df3$chirps)
+
+#you can compute the linear regression using the above statistics-
+# find slope:
+m = r*(sdtemp/sdchirps)
+m
+
+#find intercept:
+b = tempmean - (m*chirpsmean)
+b
+
+# This gives us the equation above since the slope m = .714 and 
+# the intercept b = 46.474
+```
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
